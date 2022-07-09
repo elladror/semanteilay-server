@@ -1,15 +1,15 @@
-import Guess from "../models/guess";
+import { Prisma } from "@prisma/client";
 import * as repository from "../repositories/guessReopository";
 
-export const addGuess = async (guess: Guess) => {
-  const newGuess = (await repository.addGuess(guess)).formatted();
-  const guessNumber = (await getTeamGuesses(guess.team)).length + 1;
-  
-  return {...newGuess, serialNumber: guessNumber}
+export const addGuess = async (guess: Prisma.GuessUncheckedCreateInput) => {
+  const newGuess = await repository.addGuess(guess);
+  const guessNumber =
+    (await repository.getGuessesCountByTeam(guess.teamId)) + 1;
+
+  return { ...newGuess, serialNumber: guessNumber };
 };
 
-export const getAllGuesses = async () =>
-  (await repository.getAllGuesses()).map((guess) => guess.formatted());
+export const getAllGuesses = async () => repository.getAllGuesses();
 
 export const getTeamGuesses = async (teamId: string) =>
-  (await repository.getTeamGuesses(teamId)).map((guess) => guess.formatted());
+  repository.getGuessesByTeam(teamId);
