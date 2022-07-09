@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node dist",
+    "start": "node dist",
+    "postinstall": "tsc",
+    "watch-node": "nodemon dist/index.js",
+    "watch-ts": "tsc -w",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
   },
   "dependencies": {
