@@ -1,90 +1,67 @@
-import { Entity, Schema } from "redis-om";
-import client from "../db/redis";
-import { fetchUsers } from "./userRepository";
+import { Prisma } from "@prisma/client";
+import prisma from "../db/prisma";
 
-interface Team {
-  name: string;
-  members: string[];
-}
+export const createTeam = async (team: Prisma.TeamUncheckedCreateInput) =>
+  prisma.team.create({
+    data: team,
+  });
 
-class Team extends Entity {
-  formatted() {
-    return {
-      id: this.entityId,
-      name: this.name,
-      members: this.members ?? [],
-    };
-  }
-
-  isEmpty() {
-    return this.members.length === 0;
-  }
-
-  async populate() {
-    const { id, name, members } = this.formatted();
-    return {
+export const getTeamById = async (
+  { id }: Prisma.TeamWhereUniqueInput,
+  populated = false
+) =>
+  prisma.team.findUniqueOrThrow({
+    where: {
       id,
-      name,
-      members: await fetchUsers(members),
-    };
-  }
+    },
+    include: {
+      guesses: populated,
+      members: populated,
+      room: populated,
+    },
+  });
 
-  async removeMember(userId: string) {
-    this.members = this.members.filter((member) => member !== userId);
-    await teamRepository.save(this);
-  }
+export const leaveTeam = async (
+  { id: userId }: Prisma.UserWhereUniqueInput,
+  { id: teamId }: Prisma.TeamWhereUniqueInput
+) =>
+  prisma.team.update({
+    where: {
+      id: teamId,
+    },
+    data: {
+      members: {
+        disconnect: {
+          id: userId,
+        },
+      },
+    },
+    select: {
+      members: true,
+    },
+  });
 
-  async addMember(userId: string) {
-    this.members.push(userId);
-    await teamRepository.save(this);
-  }
+export const deleteTeam = async ({ id }: Prisma.TeamWhereUniqueInput) =>
+  prisma.team.delete({
+    where: {
+      id,
+    },
+  });
 
-  static async populated(team: Team) {
-    return team.populate();
-  }
-}
-
-const schema = new Schema(Team, {
-  members: { type: "string[]" },
-  name: { type: "string" },
-}, {
-  dataStructure: 'HASH'
-});
-
-export const teamRepository = client.fetchRepository(schema);
-
-export const fetchTeams = async (teamsIds: string[]) => {
-  const teams = await Promise.all(teamsIds.map((teamId) => teamRepository.fetch(teamId)));
-  return await Promise.all(teams.map(Team.populated));
+export const joinTeam = async (
+  { id: userId }: Prisma.UserWhereUniqueInput,
+  { id: teamId }: Prisma.TeamWhereUniqueInput
+) => {
+  await prisma.team.update({
+    where: {
+      id: teamId,
+    },
+    data: {
+      members: {
+        connect: {
+          id: userId,
+        },
+      },
+    },
+  });
 };
-
-export const createTeam = async (name: string, createdBy: string) =>
-  await Team.populated(await teamRepository.createAndSave({ name, members: [createdBy] }));
-
-export const getAllTeams = async () => await teamRepository.search().returnAll();
-
-export const getTeamById = async (id: string) =>
-  await Team.populated(await teamRepository.fetch(id));
-
-export const leaveTeam = async (userId: string, teamId: string) => {
-  const team = await teamRepository.fetch(teamId);
-  await team.removeMember(userId);
-
-  return team;
-};
-
-export const deleteTeam = async (teamId: string) => await teamRepository.remove(teamId);
-
-export const joinTeam = async (userId: string, teamId: string) => {
-  const team = await teamRepository.fetch(teamId);
-  await team.addMember(userId);
-};
-
-export const getTeamByUser = async (userId: string) =>  await teamRepository.search().where('members').contain(userId).returnFirst();
-
-export const initialize = async () => {
-  await teamRepository.createIndex();
-  console.log("team index built");
-};
-
-initialize();

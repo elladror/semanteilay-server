@@ -3,50 +3,83 @@ import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { deleteUser, leaveRoom } from "../services/userService";
 
 type SocketListener = (
+  // eslint-disable-next-line no-unused-vars
   socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
+  // eslint-disable-next-line no-unused-vars
   io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
+  // eslint-disable-next-line no-unused-vars
 ) => (...args: any) => void;
 
-export const removeSocket: SocketListener = (socket) => () => {
-  const userId = socket.data.userId;
-  console.log(`user left with id: ${userId}`);
+const TEAM_PREFIX = "#team: ";
+const ROOM_PREFIX = "#room: ";
 
-  Array.from(socket.rooms)
-    .filter(isTeam(socket))
-    .forEach(async (roomId) => {
-      //TODO: add lobby leave
-      await leaveRoom(userId, roomId);
-      socket.to(roomId).emit("participantUpdate");
-    });
+const asSocketTeamId = (teamId: string) => TEAM_PREFIX + teamId;
+const asTeamId = (socketTeamId: string) =>
+  socketTeamId.replace(TEAM_PREFIX, "");
 
-  deleteUser(userId);
+const asSocketRoomId = (roomId: string) => ROOM_PREFIX + roomId;
+const asRoomId = (socketRoomId: string) =>
+  socketRoomId.replace(ROOM_PREFIX, "");
+
+const isTeam = (roomId: string) => roomId.includes(TEAM_PREFIX);
+const isRoom = (roomId: string) => roomId.includes(ROOM_PREFIX);
+
+export const removeSocket: SocketListener = (socket) => async () => {
+  const socketTeamId = Array.from(socket.rooms).find(isTeam) as string;
+  const socketRoomId = Array.from(socket.rooms).find(isRoom);
+
+  if (socketRoomId) {
+    socket.leave(socketRoomId);
+
+    if (socketTeamId) {
+      await leaveRoom(
+        socket.data.userId,
+        asRoomId(socketRoomId),
+        asTeamId(socketTeamId)
+      );
+    }
+
+    socket.to(socketRoomId).emit("participantUpdate");
+  }
+
+  socket.leave("lobby");
+  socket.leave(socketTeamId);
+
+  if (socket.data.userId) deleteUser(socket.data.userId);
 };
 
 export const handleLeaveRoom: SocketListener =
   (socket, io) =>
   async ({ id }) => {
-    const userId = socket.data.userId;
-    socket.leave(id);
-    socket.leave(Array.from(socket.rooms).find(isTeam(socket)) as string);
-    await leaveRoom(userId, id);
+    const socketTeamId = Array.from(socket.rooms).find(isTeam);
+
+    socket.leave(asSocketRoomId(id));
+
+    if (socketTeamId) {
+      socket.leave(socketTeamId);
+      await leaveRoom(socket.data.userId, id, asTeamId(socketTeamId));
+    }
+
     io.to(socket.id).emit("kickFromTeam");
-    io.of("/").to(id).emit("participantUpdate");
+    io.of("/").to(asSocketRoomId(id)).emit("participantUpdate");
   };
 
-export const handleNewGuess: SocketListener = (socket, io) => async (guess) => {
-  socket.to(guess.team).emit("newGuess", guess);
-};
+export const handleJoinRoom: SocketListener =
+  (socket, io) =>
+  ({ id }) => {
+    socket.join(asSocketRoomId(id));
+    io.of("/").to(asSocketRoomId(id)).emit("participantUpdate");
+  };
 
-export const handleJoinTeam: SocketListener = (socket, io) => async (teamId) => {
-  console.log(`socket: ${socket.id} joined team: ${teamId}`);
-  socket.join(teamId);
-};
+export const handleSwitchTeam: SocketListener =
+  (socket, io) =>
+  async ({ newTeamId, oldTeamId, roomId }) => {
+    if (oldTeamId) socket.leave(asSocketTeamId(oldTeamId));
+    socket.join(asSocketTeamId(newTeamId));
+    io.of("/").to(asSocketRoomId(roomId)).emit("participantUpdate");
+  };
 
-export const handleLeaveTeam: SocketListener = (socket, io) => async (teamId) => {
-  console.log(`socket: ${socket.id} left team: ${teamId}`);
-  socket.leave(teamId);
-};
-
-const isTeam =
-  (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => (roomId: string) =>
-    roomId !== socket.id && roomId !== "lobby";
+// eslint-disable-next-line no-unused-vars, prettier/prettier
+export const handleNewGuess: SocketListener = (socket, _io) => async (guess) => {
+    socket.to(asSocketTeamId(guess.team)).emit("newGuess", guess);
+  };

@@ -14,7 +14,7 @@ model User {
   id      String  @id @default(uuid())
   name    String  @unique
   team    Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
-  teamId  String
+  teamId  String?
   guesses Guess[]
 }
 
@@ -36,12 +36,12 @@ model Room {
 }
 
 model Guess {
-  id      String @id @default(uuid())
+  id      String  @id @default(uuid())
   word    String
-  score   Int
+  score   Float
   rank    Int
-  owner   User?  @relation(fields: [ownerId], references: [id], onDelete: SetNull)
-  ownerId String
-  team    Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  owner   User?   @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId String?
+  team    Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
   teamId  String
 }

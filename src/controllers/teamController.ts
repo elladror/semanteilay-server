@@ -1,49 +1,39 @@
 import { Router } from "express";
-import { getTeamByUser } from "../repositories/teamRepository";
 import {
   changeTeam,
   createTeam,
-  getAllTeams,
-  getTeamById,
-  leaveTeam,
+  getPopulatedTeamById,
 } from "../services/teamService";
 
-export const router = Router();
+const teamRouter = Router();
 
-router.post("/", async (req, res) => {
+teamRouter.post("/", async (req, res) => {
   try {
     const team = await createTeam(req.body);
     res.send(team.id);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send((err as Error).message);
   }
 });
 
-router.get("/:id", async (req, res) => {
+teamRouter.get("/:id", async (req, res) => {
   try {
-    const team = await getTeamById(req.params.id);
+    const team = await getPopulatedTeamById(req.params.id);
     res.send(team);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send((err as Error).message);
   }
 });
 
-router.get("", async (req, res) => {
+teamRouter.patch("", async (req, res) => {
   try {
-    const teams = await getAllTeams();
-    res.send(teams);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
+    const { userId, teamId, oldTeamId } = req.body;
+    await changeTeam(userId, teamId, oldTeamId);
 
-router.patch("", async (req, res) => {
-  try {
-    const { userId, teamId, roomId } = req.body;
-    await changeTeam(userId, teamId, roomId);
-  
     res.status(200).send();
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send((err as Error).message);
   }
 });
+
+export default teamRouter;

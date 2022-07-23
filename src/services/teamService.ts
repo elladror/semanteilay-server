@@ -1,7 +1,7 @@
 import * as repository from "../repositories/teamRepository";
-import { addTeamToRoom, removeTeamFromRoom } from "./roomService";
 
-export const getTeamById = async (id: string) => await repository.getTeamById(id);
+export const getPopulatedTeamById = async (id: string) =>
+  repository.getTeamById({ id }, true);
 
 interface CreateTeamParams {
   name: string;
@@ -9,34 +9,32 @@ interface CreateTeamParams {
   roomId: string;
 }
 
-export const createTeam = async ({ name, userId, roomId }: CreateTeamParams) => {
-  const team = await repository.createTeam(name, userId);
-  await addTeamToRoom(roomId, team.id);
+export const createTeam = async ({ name, userId, roomId }: CreateTeamParams) =>
+  repository.createTeam({
+    name,
+    roomId,
+    members: {
+      connect: {
+        id: userId,
+      },
+    },
+  });
+export const leaveTeam = async (userId: string, teamId: string) => {
+  const team = await repository.leaveTeam({ id: userId }, { id: teamId });
 
-  return team;
-};
-
-export const leaveTeam = async (userId: string, roomId: string, teamId?: string) => {
-  teamId = teamId ?? (await getTeamByUser(userId)).entityId;
-  const team = await repository.leaveTeam(userId, teamId);
-
-  if (team.isEmpty()) {
-    await removeTeamFromRoom(roomId, teamId);
-    await repository.deleteTeam(teamId);
-  }
+  if (team.members.length === 0) await repository.deleteTeam({ id: teamId });
 };
 
 export const joinTeam = async (userId: string, teamId: string) => {
-  await repository.joinTeam(userId, teamId);
+  await repository.joinTeam({ id: userId }, { id: teamId });
 };
 
-export const getTeamByUser = async (userId: string) => await repository.getTeamByUser(userId);
-
-export const changeTeam = async (userId: string, teamId: string, roomdId: string) => {
-  const oldTeam = await getTeamByUser(userId);
-  if (oldTeam && oldTeam.entityId !== teamId) await leaveTeam(userId, roomdId, oldTeam.entityId); // TODO: maybe fix band-aid looking code
+export const changeTeam = async (
+  userId: string,
+  teamId: string,
+  oldTeamId?: string
+) => {
+  if (oldTeamId) await leaveTeam(userId, oldTeamId);
 
   await joinTeam(userId, teamId);
 };
-
-export const getAllTeams = async () => await repository.getAllTeams();

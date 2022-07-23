@@ -1,31 +1,37 @@
-import { getAllRooms, createRoom, getPopulatedRoomById } from "../services/roomService";
 import { Router } from "express";
+import {
+  getAllRooms,
+  createRoom,
+  getPopulatedRoomById,
+} from "../services/roomService";
 
-export const router = Router();
+const roomRouter = Router();
 
-router.post("/", async (req, res) => {
+roomRouter.post("/", async (req, res) => {
   try {
     const room = await createRoom(req.body.roomName);
     res.send(room);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send((err as Error).message);
   }
 });
 
-router.get("/:id", async (req, res) => {
+roomRouter.get("/:id", async (req, res) => {
   try {
     const room = await getPopulatedRoomById(req.params.id);
     res.send(room);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send((err as Error).message);
   }
 });
 
-router.get("", async (req, res) => {
+roomRouter.get("", async (req, res) => {
   try {
     const rooms = await getAllRooms();
     res.send(rooms);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send((err as Error).message);
   }
 });
+
+export default roomRouter;
