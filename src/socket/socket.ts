@@ -7,6 +7,7 @@ import {
   handleNewGuess,
   handleSwitchTeam,
   handleJoinRoom,
+  handleRoomsUpdate,
 } from "./socketListeners";
 
 let io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
@@ -24,21 +25,20 @@ export const init = (server: http.Server) => {
     socket.on("switchTeam", handleSwitchTeam(socket, io));
     socket.on("joinRoom", handleJoinRoom(socket, io));
     socket.on("leaveRoom", handleLeaveRoom(socket, io));
-
+    socket.on("create-room", handleRoomsUpdate(socket, io));
+    socket.on("delete-room", handleRoomsUpdate(socket, io));
     socket.on("joinLobby", () => {
       socket.join("lobby");
     });
   });
-
-  io.of("/").adapter.on("delete-room", () => {
-    // TODO: add listeners and emitters for room createion/deletion
-    io.to("lobby").emit("roomsUpdated"); // TODO: consider moving from SWR to emitting map of rooms and participants
-  });
 };
-
 export const getParticipantCount = ({ id }: { id: string }) =>
   io.sockets.adapter.rooms.get(id)?.size ?? 0;
 
 export const hookSocketWithUser = async (userId: string, socketId: string) => {
   (await io.in(socketId).fetchSockets())[0].data.userId = userId;
+};
+
+export const emitRoomDeleted = () => {
+  io.to("lobby").emit("roomsUpdated");
 };

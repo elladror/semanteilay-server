@@ -1,6 +1,14 @@
 import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { deleteUser, leaveRoom } from "../services/userService";
+import {
+  isTeam,
+  isRoom,
+  asRoomId,
+  asTeamId,
+  asSocketRoomId,
+  asSocketTeamId,
+} from "./utils";
 
 type SocketListener = (
   // eslint-disable-next-line no-unused-vars
@@ -9,20 +17,6 @@ type SocketListener = (
   io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
   // eslint-disable-next-line no-unused-vars
 ) => (...args: any) => void;
-
-const TEAM_PREFIX = "#team: ";
-const ROOM_PREFIX = "#room: ";
-
-const asSocketTeamId = (teamId: string) => TEAM_PREFIX + teamId;
-const asTeamId = (socketTeamId: string) =>
-  socketTeamId.replace(TEAM_PREFIX, "");
-
-const asSocketRoomId = (roomId: string) => ROOM_PREFIX + roomId;
-const asRoomId = (socketRoomId: string) =>
-  socketRoomId.replace(ROOM_PREFIX, "");
-
-const isTeam = (roomId: string) => roomId.includes(TEAM_PREFIX);
-const isRoom = (roomId: string) => roomId.includes(ROOM_PREFIX);
 
 export const removeSocket: SocketListener = (socket) => async () => {
   const socketTeamId = Array.from(socket.rooms).find(isTeam) as string;
@@ -83,3 +77,7 @@ export const handleSwitchTeam: SocketListener =
 export const handleNewGuess: SocketListener = (socket, _io) => async (guess) => {
     socket.to(asSocketTeamId(guess.team)).emit("newGuess", guess);
   };
+
+export const handleRoomsUpdate: SocketListener = (_socket, io) => async () => {
+  io.to("lobby").emit("roomsUpdated"); // TODO: consider moving from SWR to emitting map of rooms and participants
+};

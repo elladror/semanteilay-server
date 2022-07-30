@@ -1,4 +1,4 @@
-import { getParticipantCount } from "../socket/socket";
+import { emitRoomDeleted, getParticipantCount } from "../socket/socket";
 import * as repository from "../repositories/roomRepository";
 
 export const createRoom = async (name: string) =>
@@ -22,5 +22,8 @@ export const getPopulatedRoomById = async (id: string) => {
 
 export const deleteRoomIfEmpty = async (roomId: string) => {
   const room = await repository.getRoomById({ id: roomId }, true);
-  if (room.teams.length === 0) await repository.deleteRoom({ id: roomId });
+  if (room.teams.length === 0) {
+    await repository.deleteRoom({ id: roomId });
+    emitRoomDeleted();
+  }
 };
