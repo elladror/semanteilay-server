@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id      String  @id @default(uuid())
+  name    String  @unique
+  team    Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  teamId  String?
+  guesses Guess[]
+}
+
+model Team {
+  id      String  @id @default(uuid())
+  name    String
+  room    Room    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomId  String
+  members User[]
+  guesses Guess[]
+
+  @@unique([name, roomId])
+}
+
+model Room {
+  id    String @id @default(uuid())
+  name  String @unique
+  teams Team[]
+}
+
+model Guess {
+  id      String  @id @default(uuid())
+  word    String
+  score   Float
+  rank    Int
+  owner   User?   @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId String?
+  team    Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId  String
+}
