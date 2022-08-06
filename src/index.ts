@@ -7,10 +7,12 @@ import userRouter from "./controllers/userController";
 import roomRouter from "./controllers/roomController";
 import teamRouter from "./controllers/teamController";
 import guessRouter from "./controllers/guessController";
+import corsOptions from "./utils/corsOptions";
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: process.env.CLIENT_URL ?? "http://localhost:3000" }));
+
+app.use(cors(corsOptions));
 const server = http.createServer(app);
 
 socket.init(server);
