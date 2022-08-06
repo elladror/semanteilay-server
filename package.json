@@ -5,19 +5,17 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist",
-    "postinstall": "tsc",
+    "postinstall": "tsc && npx prisma migrate deploy",
     "watch-node": "nodemon dist/index.js",
     "watch-ts": "tsc -w",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
   },
   "dependencies": {
-    "@prisma/client": "^4.0.0",
+    "@prisma/client": "^4.1.1",
     "axios": "^0.27.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
-    "redis": "^4.1.0",
-    "redis-om": "^0.2.1",
     "socket.io": "^4.4.1"
   },
   "devDependencies": {
@@ -34,7 +32,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "nodemon": "^2.0.16",
-    "prisma": "^4.0.0",
+    "prisma": "^4.1.1",
     "typescript": "4.6.3"
   }
 }
