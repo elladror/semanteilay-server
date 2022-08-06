@@ -7,7 +7,7 @@ import userRouter from "./controllers/userController";
 import roomRouter from "./controllers/roomController";
 import teamRouter from "./controllers/teamController";
 import guessRouter from "./controllers/guessController";
-import corsOptions from "./utils/corsOptions";
+import corsOptions from "./utils/cors/corsOptions";
 
 const app = express();
 app.use(express.json());
