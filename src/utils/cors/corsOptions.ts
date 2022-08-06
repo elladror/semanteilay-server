@@ -1,4 +1,5 @@
 import { CorsOptions } from "cors";
+import CorsError from "./corsError";
 
 const client = process.env.CLIENT_URL ?? "http://localhost:3000";
 
@@ -8,7 +9,7 @@ const corsOptions: CorsOptions = {
     if (whitelist.includes(origin as string)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new CorsError(`origin ${origin} not allowed`));
     }
   },
 };
