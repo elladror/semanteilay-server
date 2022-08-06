@@ -1,3 +1,4 @@
+// TODO: fix circular import
 import { emitRoomDeleted, getParticipantCount } from "../socket/socket";
 import * as repository from "../repositories/roomRepository";
 
