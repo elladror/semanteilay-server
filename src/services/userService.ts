@@ -1,4 +1,4 @@
-import { hookSocketWithUser } from "../socket/socket";
+import { hookSocketWithUser } from "../socket/utils";
 import * as repository from "../repositories/userRepository";
 import { deleteRoomIfEmpty } from "./roomService";
 import { leaveTeam } from "./teamService";
@@ -16,12 +16,16 @@ export const signUp = async (name: string, socketId: string) => {
 
 export const getUserById = async (id: string) => repository.getUserById({ id });
 
-export const leaveRoom = async (
-  userId: string,
-  roomId: string,
-  teamId: string
-) => {
-  await leaveTeam(userId, teamId);
+export const leaveRoom = async ({
+  userId,
+  roomId,
+  teamId,
+}: {
+  userId: string;
+  roomId: string;
+  teamId: string;
+}) => {
+  await leaveTeam({ userId, roomId, teamId });
   await deleteRoomIfEmpty(roomId);
 };
 

@@ -9,10 +9,11 @@ import {
   handleJoinRoom,
   handleRoomsUpdate,
 } from "./socketListeners";
+import { injectIO } from "./utils";
 
 let io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
 
-export const init = (server: http.Server) => {
+const init = (server: http.Server) => {
   io = new Server(server, {
     cors: {
       origin: "*", // allowing cors from anywhere
@@ -31,14 +32,8 @@ export const init = (server: http.Server) => {
       socket.join("lobby");
     });
   });
-};
-export const getParticipantCount = ({ id }: { id: string }) =>
-  io.sockets.adapter.rooms.get(id)?.size ?? 0;
 
-export const hookSocketWithUser = async (userId: string, socketId: string) => {
-  (await io.in(socketId).fetchSockets())[0].data.userId = userId;
+  injectIO(io);
 };
 
-export const emitRoomDeleted = () => {
-  io.to("lobby").emit("roomsUpdated");
-};
+export default init;

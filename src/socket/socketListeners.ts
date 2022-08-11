@@ -26,11 +26,15 @@ export const removeSocket: SocketListener = (socket) => async () => {
     socket.leave(socketRoomId);
 
     if (socketTeamId) {
-      await leaveRoom(
-        socket.data.userId,
-        asRoomId(socketRoomId),
-        asTeamId(socketTeamId)
-      );
+      try {
+        await leaveRoom({
+          userId: socket.data.userId,
+          roomId: asRoomId(socketRoomId),
+          teamId: asTeamId(socketTeamId),
+        });
+      } catch (error) {
+        console.log("failed to leave socket team and rooms from disconnect");
+      }
     }
 
     socket.to(socketRoomId).emit("participantUpdate");
@@ -51,7 +55,11 @@ export const handleLeaveRoom: SocketListener =
 
     if (socketTeamId) {
       socket.leave(socketTeamId);
-      await leaveRoom(socket.data.userId, id, asTeamId(socketTeamId));
+      await leaveRoom({
+        userId: socket.data.userId,
+        roomId: id,
+        teamId: asTeamId(socketTeamId),
+      });
     }
 
     io.to(socket.id).emit("kickFromTeam");
@@ -66,12 +74,12 @@ export const handleJoinRoom: SocketListener =
   };
 
 export const handleSwitchTeam: SocketListener =
-  (socket, io) =>
-  async ({ newTeamId, oldTeamId, roomId }) => {
-    if (oldTeamId) socket.leave(asSocketTeamId(oldTeamId));
-    socket.join(asSocketTeamId(newTeamId));
-    io.of("/").to(asSocketRoomId(roomId)).emit("participantUpdate");
-  };
+  // eslint-disable-next-line no-unused-vars, prettier/prettier
+  (socket, _io) =>
+    async ({ newTeamId, oldTeamId }) => {
+      if (oldTeamId) socket.leave(asSocketTeamId(oldTeamId));
+      socket.join(asSocketTeamId(newTeamId));
+    };
 
 // eslint-disable-next-line no-unused-vars, prettier/prettier
 export const handleNewGuess: SocketListener = (socket, _io) => async (guess) => {

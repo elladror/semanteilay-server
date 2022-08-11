@@ -1,3 +1,4 @@
+import { emitToRoom } from "../socket/utils";
 import * as repository from "../repositories/teamRepository";
 
 export const getPopulatedTeamById = async (id: string) =>
@@ -19,10 +20,28 @@ export const createTeam = async ({ name, userId, roomId }: CreateTeamParams) =>
       },
     },
   });
-export const leaveTeam = async (userId: string, teamId: string) => {
-  const team = await repository.leaveTeam({ id: userId }, { id: teamId });
+export const leaveTeam = async ({
+  userId,
+  roomId,
+  teamId,
+}: {
+  userId: string;
+  teamId: string;
+  roomId?: string;
+}) => {
+  const team = await repository.leaveTeam({ userId, teamId });
 
-  if (team.members.length === 0) await repository.deleteTeam({ id: teamId });
+  if (team.members.length === 0) {
+    const deletedTeamRoomId =
+      roomId ?? (await getPopulatedTeamById(teamId)).roomId;
+    await repository.deleteTeam({ id: teamId });
+
+    emitToRoom({
+      event: "teamDeleted",
+      roomId: deletedTeamRoomId,
+      payload: { teamId },
+    });
+  }
 };
 
 export const joinTeam = async (userId: string, teamId: string) => {
@@ -34,7 +53,7 @@ export const changeTeam = async (
   teamId: string,
   oldTeamId?: string
 ) => {
-  if (oldTeamId) await leaveTeam(userId, oldTeamId);
+  if (oldTeamId) await leaveTeam({ userId, teamId: oldTeamId });
 
   await joinTeam(userId, teamId);
 };

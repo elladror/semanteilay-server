@@ -1,5 +1,5 @@
 // TODO: fix circular import
-import { emitRoomDeleted, getParticipantCount } from "../socket/socket";
+import { emitRoomDeleted, getParticipantCount } from "../socket/utils";
 import * as repository from "../repositories/roomRepository";
 
 export const createRoom = async (name: string) =>

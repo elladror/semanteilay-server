@@ -21,10 +21,13 @@ export const getTeamById = async (
     },
   });
 
-export const leaveTeam = async (
-  { id: userId }: Prisma.UserWhereUniqueInput,
-  { id: teamId }: Prisma.TeamWhereUniqueInput
-) =>
+export const leaveTeam = async ({
+  userId,
+  teamId,
+}: {
+  userId: string;
+  teamId: string;
+}) =>
   prisma.team.update({
     where: {
       id: teamId,
