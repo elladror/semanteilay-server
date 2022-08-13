@@ -8,15 +8,16 @@ export const addGuess = async (guess: {
 }) => {
   const { similarity: score, distance: rank } = await guessWord(guess.word);
 
-  return {
-    ...(await repository.addGuess({ ...guess, score, rank })),
-    serialNumber: await repository.getGuessesCountByTeam({
-      teamId: guess.teamId,
-    }),
-  };
+  return repository.addGuess({
+    ...guess,
+    score,
+    rank,
+    serialNumber:
+      (await repository.getGuessesCountByTeam({
+        teamId: guess.teamId,
+      })) + 1,
+  });
 };
 
-export const getAllGuesses = async () => repository.getAllGuesses();
-
 export const getTeamGuesses = async (teamId: string) =>
-  repository.getGuessesByTeam({ teamId });
+  repository.getGuessesByTeam({ teamId, sorted: true });

@@ -4,13 +4,19 @@ import prisma from "../db/prisma";
 export const addGuess = async (guess: Prisma.GuessUncheckedCreateInput) =>
   prisma.guess.create({ data: guess });
 
-export const getAllGuesses = async () => prisma.guess.findMany();
-
-export const getGuessesByTeam = async ({ teamId }: Prisma.GuessWhereInput) =>
+export const getGuessesByTeam = async ({
+  teamId,
+  sorted,
+}: Prisma.GuessWhereInput & { sorted?: boolean }) =>
   prisma.guess.findMany({
     where: {
       teamId,
     },
+    orderBy: sorted
+      ? {
+          score: "desc",
+        }
+      : {},
   });
 
 export const getGuessesCountByTeam = async ({

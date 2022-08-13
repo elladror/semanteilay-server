@@ -9,8 +9,8 @@ const teamRouter = Router();
 
 teamRouter.post("/", async (req, res) => {
   try {
-    const team = await createTeam(req.body);
-    res.send(team.id);
+    const teamId = await createTeam(req.body);
+    res.send(teamId);
   } catch (err) {
     res.status(500).send((err as Error).message);
   }

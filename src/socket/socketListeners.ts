@@ -83,7 +83,7 @@ export const handleSwitchTeam: SocketListener =
 
 // eslint-disable-next-line no-unused-vars, prettier/prettier
 export const handleNewGuess: SocketListener = (socket, _io) => async (guess) => {
-    socket.to(asSocketTeamId(guess.team)).emit("newGuess", guess);
+    socket.to(asSocketTeamId(guess.teamId)).emit("newGuess", guess);
   };
 
 export const handleRoomsUpdate: SocketListener = (_socket, io) => async () => {

@@ -4,22 +4,16 @@ import * as repository from "../repositories/teamRepository";
 export const getPopulatedTeamById = async (id: string) =>
   repository.getTeamById({ id }, true);
 
+export const joinTeam = async (userId: string, teamId: string) => {
+  await repository.joinTeam({ id: userId }, { id: teamId });
+};
 interface CreateTeamParams {
   name: string;
   userId: string;
   roomId: string;
+  oldTeamId?: string;
 }
 
-export const createTeam = async ({ name, userId, roomId }: CreateTeamParams) =>
-  repository.createTeam({
-    name,
-    roomId,
-    members: {
-      connect: {
-        id: userId,
-      },
-    },
-  });
 export const leaveTeam = async ({
   userId,
   roomId,
@@ -44,10 +38,6 @@ export const leaveTeam = async ({
   }
 };
 
-export const joinTeam = async (userId: string, teamId: string) => {
-  await repository.joinTeam({ id: userId }, { id: teamId });
-};
-
 export const changeTeam = async (
   userId: string,
   teamId: string,
@@ -56,4 +46,30 @@ export const changeTeam = async (
   if (oldTeamId) await leaveTeam({ userId, teamId: oldTeamId });
 
   await joinTeam(userId, teamId);
+};
+
+export const createTeam = async ({
+  name,
+  userId,
+  roomId,
+  oldTeamId,
+}: CreateTeamParams) => {
+  const { id } = await repository.createTeam({
+    name,
+    roomId,
+    members: {
+      connect: {
+        id: userId,
+      },
+    },
+  }); // TODO: switch team for user from here + delete from client + integrate with leaving a team
+
+  await changeTeam(userId, id, oldTeamId);
+
+  emitToRoom({
+    event: "participantUpdate",
+    roomId,
+  });
+
+  return id;
 };
