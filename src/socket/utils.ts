@@ -23,9 +23,6 @@ export const injectIO = (
   io = injectedIO;
 };
 
-export const getParticipantCount = ({ id }: { id: string }) =>
-  io.sockets.adapter.rooms.get(id)?.size ?? 0;
-
 export const hookSocketWithUser = async (userId: string, socketId: string) => {
   (await io.in(socketId).fetchSockets())[0].data.userId = userId;
 };
