@@ -21,3 +21,6 @@ export const addGuess = async (guess: {
 
 export const getTeamGuesses = async (teamId: string) =>
   repository.getGuessesByTeam({ teamId, sorted: true });
+
+export const getTeamsTopGuesses = async (teams: string[]) =>
+  repository.getTeamsTopGuesses(teams);

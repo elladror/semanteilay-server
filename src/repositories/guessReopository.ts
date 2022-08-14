@@ -27,3 +27,22 @@ export const getGuessesCountByTeam = async ({
       teamId,
     },
   });
+
+export const getTeamsTopGuesses = async (teams: string[]) =>
+  prisma.guess.groupBy({
+    by: ["teamId"],
+    where: {
+      teamId: {
+        in: teams,
+      },
+    },
+    _max: {
+      score: true,
+      rank: true,
+    },
+    orderBy: {
+      _max: {
+        score: "desc",
+      },
+    },
+  });

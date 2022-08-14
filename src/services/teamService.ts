@@ -27,7 +27,7 @@ export const leaveTeam = async ({
 
   if (team.members.length === 0) {
     const deletedTeamRoomId =
-      roomId ?? (await getPopulatedTeamById(teamId)).roomId;
+      roomId ?? (await repository.getTeamById({ id: teamId })).roomId;
     await repository.deleteTeam({ id: teamId });
 
     emitToRoom({
