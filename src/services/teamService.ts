@@ -54,8 +54,16 @@ export const createTeam = async ({
   roomId,
   oldTeamId,
 }: CreateTeamParams) => {
-  const { id } = await repository.createTeam({
+  const teamsWithThisNameInRoom = await repository.TeamsWithThisNameInRoom({
+    roomId,
     name,
+  });
+
+  const { id } = await repository.createTeam({
+    name:
+      teamsWithThisNameInRoom === 0
+        ? name
+        : `${name} (${teamsWithThisNameInRoom})`,
     roomId,
     members: {
       connect: {

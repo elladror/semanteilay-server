@@ -46,3 +46,16 @@ export const getTeamsTopGuesses = async (teams: string[]) =>
       },
     },
   });
+
+export const getTeamTopGuess = async (teamId: string) =>
+  (
+    await prisma.guess.findMany({
+      where: {
+        teamId,
+      },
+      orderBy: {
+        score: "desc",
+      },
+      take: 1,
+    })
+  )[0];

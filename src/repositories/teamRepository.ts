@@ -68,3 +68,19 @@ export const joinTeam = async (
     },
   });
 };
+
+export const TeamsWithThisNameInRoom = async ({
+  roomId,
+  name,
+}: {
+  roomId: string;
+  name: string;
+}) =>
+  prisma.team.count({
+    where: {
+      name: {
+        contains: name,
+      },
+      roomId,
+    },
+  });
