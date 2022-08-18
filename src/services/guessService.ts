@@ -12,16 +12,12 @@ export const addGuess = async (guess: {
 
   const topGuess = await repository.getTeamTopGuess(guess.teamId);
 
-  if (score > topGuess?.score ?? -100) {
-    // TODO: fix first one not emitting
-    console.log("emit");
-
+  if (score > (topGuess?.score ?? -100))
     emitToRoom({
       event: "topGuessUpdate",
       roomId: guess.roomId,
       payload: { teamId: guess.teamId, topGuess: { score, rank } },
     });
-  }
 
   return repository.addGuess({
     word: guess.word,
