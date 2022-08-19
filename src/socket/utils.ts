@@ -42,3 +42,15 @@ export const emitToRoom = ({
 }) => {
   io.of("/").to(asSocketRoomId(roomId)).emit(event, payload);
 };
+
+export const emitToSocket = ({
+  event,
+  socketId,
+  payload,
+}: {
+  event: string;
+  socketId: string;
+  payload?: {};
+}) => {
+  io.of("/").to(socketId).emit(event, payload);
+};

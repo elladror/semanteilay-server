@@ -1,5 +1,12 @@
 import { Router } from "express";
-import { getUserById, signUp } from "../services/userService";
+import {
+  getUserById,
+  joinRoom,
+  leaveRoom,
+  login,
+  setIdle,
+  signUp,
+} from "../services/userService";
 
 const userRouter = Router();
 
@@ -18,6 +25,50 @@ userRouter.get("/:id", async (req, res) => {
     res.send(user);
   } catch (err) {
     res.status(500).send((err as Error).message);
+  }
+});
+
+userRouter.patch("/", async (req, res) => {
+  try {
+    const user = await login(req.body);
+    res.send(user);
+  } catch (err) {
+    const status = (err as Error).message === "user not found" ? 404 : 500;
+
+    res.status(status).send((err as Error).message);
+  }
+});
+
+userRouter.patch("/idle", async (req, res) => {
+  try {
+    const user = await setIdle(req.body.userId);
+    res.send(user);
+  } catch (err) {
+    const status = (err as Error).message === "user not found" ? 404 : 500;
+
+    res.status(status).send((err as Error).message);
+  }
+});
+
+userRouter.patch("/leaveRoom", async (req, res) => {
+  try {
+    const user = await leaveRoom(req.body);
+    res.send(user);
+  } catch (err) {
+    const status = (err as Error).message === "user not found" ? 404 : 500;
+
+    res.status(status).send((err as Error).message);
+  }
+});
+
+userRouter.patch("/joinRoom", async (req, res) => {
+  try {
+    const user = await joinRoom(req.body);
+    res.send(user);
+  } catch (err) {
+    const status = (err as Error).message === "user not found" ? 404 : 500;
+
+    res.status(status).send((err as Error).message);
   }
 });
 

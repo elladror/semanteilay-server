@@ -34,11 +34,7 @@ export const getPopulatedRoomById = async (id: string) => {
 
   return { ...room, teams: teamsWithGuesses };
 };
-export const deleteRoomIfEmpty = async (roomId: string) => {
-  const room = await repository.getRoomById({ id: roomId });
-
-  if (room.teams.length === 0) {
-    await repository.deleteRoom({ id: roomId });
-    emitRoomDeleted();
-  }
+export const deleteRoom = async (roomId: string) => {
+  await repository.deleteRoom({ id: roomId });
+  emitRoomDeleted();
 };

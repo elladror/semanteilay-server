@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
 import prisma from "../db/prisma";
 
 export const getUserById = async ({ id }: Prisma.UserWhereUniqueInput) =>
@@ -23,3 +23,67 @@ export const createUser = async ({ name }: Prisma.UserCreateInput) =>
 
 export const deleteUser = async ({ id }: Prisma.UserWhereUniqueInput) =>
   prisma.user.delete({ where: { id } });
+
+const updateCallWrapper = async (wrapped: Promise<User>) => {
+  try {
+    return await wrapped;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2025") throw new Error("user not found");
+    }
+
+    throw error;
+  }
+};
+
+export const login = async ({ id }: Prisma.UserWhereUniqueInput) =>
+  updateCallWrapper(
+    prisma.user.update({
+      where: { id },
+      data: {
+        status: "ACTIVE",
+      },
+    })
+  );
+
+export const setIdle = async ({ id }: Prisma.UserWhereUniqueInput) =>
+  updateCallWrapper(
+    prisma.user.update({
+      where: { id },
+      data: {
+        status: "IDLE",
+      },
+    })
+  );
+
+export const leaveRoom = async ({ id }: Prisma.UserWhereUniqueInput) =>
+  updateCallWrapper(
+    prisma.user.update({
+      where: { id },
+      data: {
+        roomId: "",
+      },
+    })
+  );
+
+export const joinRoom = async ({
+  userId,
+  roomId,
+}: {
+  userId: string;
+  roomId: string;
+}) =>
+  updateCallWrapper(
+    prisma.user.update({
+      where: { id: userId },
+      data: {
+        roomId,
+      },
+    })
+  );
+export const userCountInRoom = async (roomId: string) =>
+  prisma.user.count({
+    where: {
+      roomId,
+    },
+  });
