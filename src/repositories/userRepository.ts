@@ -81,9 +81,36 @@ export const joinRoom = async ({
       },
     })
   );
+
 export const userCountInRoom = async (roomId: string) =>
   prisma.user.count({
     where: {
       roomId,
     },
   });
+
+export const joinTeam = async ({
+  userId,
+  teamId,
+}: {
+  userId: string;
+  teamId: string;
+}) =>
+  updateCallWrapper(
+    prisma.user.update({
+      where: { id: userId },
+      data: {
+        teamId,
+      },
+    })
+  );
+
+export const leaveTeam = async ({ userId }: { userId: string }) =>
+  updateCallWrapper(
+    prisma.user.update({
+      where: { id: userId },
+      data: {
+        teamId: null,
+      },
+    })
+  );

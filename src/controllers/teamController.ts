@@ -1,8 +1,9 @@
 import { Router } from "express";
 import {
-  changeTeam,
   createTeam,
   getPopulatedTeamById,
+  joinTeam,
+  leaveTeam,
 } from "../services/teamService";
 
 const teamRouter = Router();
@@ -25,10 +26,19 @@ teamRouter.get("/:id", async (req, res) => {
   }
 });
 
-teamRouter.patch("", async (req, res) => {
+teamRouter.patch("/join", async (req, res) => {
   try {
-    const { userId, teamId, oldTeamId } = req.body;
-    await changeTeam(userId, teamId, oldTeamId);
+    await joinTeam(req.body);
+
+    res.status(200).send();
+  } catch (err) {
+    res.status(500).send((err as Error).message);
+  }
+});
+
+teamRouter.patch("/leave", async (req, res) => {
+  try {
+    await leaveTeam(req.body);
 
     res.status(200).send();
   } catch (err) {

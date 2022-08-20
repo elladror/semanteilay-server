@@ -36,14 +36,6 @@ export const deleteUser = async (userId: string) =>
 export const userCountInRoom = async (roomId: string) =>
   repository.userCountInRoom(roomId);
 
-export const joinRoom = async ({
-  userId,
-  roomId,
-}: {
-  userId: string;
-  roomId: string;
-}) => repository.joinRoom({ userId, roomId });
-
 export const leaveRoom = async ({
   roomId,
   userId,
@@ -57,12 +49,9 @@ export const leaveRoom = async ({
 
   const DELETE_ROOM_IF_EMPTY_DELAY = 1000 * 10 * 1;
 
-  console.log("called");
-
   setTimeout(async () => {
     try {
       if ((await userCountInRoom(roomId)) === 0) {
-        console.log("delayed delete room called");
         await deleteRoom(roomId);
         emitToSocket({ event: "kickFromTeam", socketId });
       }
@@ -71,3 +60,29 @@ export const leaveRoom = async ({
     }
   }, DELETE_ROOM_IF_EMPTY_DELAY);
 };
+
+export const joinRoom = async ({
+  userId,
+  roomId,
+  socketId,
+}: {
+  userId: string;
+  roomId: string;
+  socketId: string;
+}) => {
+  const { roomId: oldRoomId } = await repository.getUserById({ id: userId });
+  if (oldRoomId) leaveRoom({ userId, roomId: oldRoomId, socketId });
+
+  return repository.joinRoom({ userId, roomId });
+};
+
+export const joinTeam = async ({
+  userId,
+  teamId,
+}: {
+  userId: string;
+  teamId: string;
+}) => repository.joinTeam({ userId, teamId });
+
+export const leaveTeam = async ({ userId }: { userId: string }) =>
+  repository.leaveTeam({ userId });

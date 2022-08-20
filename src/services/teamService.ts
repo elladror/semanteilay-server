@@ -1,18 +1,23 @@
 import { emitToRoom } from "../socket/utils";
 import * as repository from "../repositories/teamRepository";
+import * as userRepository from "./userService";
 
 export const getPopulatedTeamById = async (id: string) =>
   repository.getTeamById({ id }, true);
 
-export const joinTeam = async (userId: string, teamId: string) => {
-  await repository.joinTeam({ id: userId }, { id: teamId });
-};
-interface CreateTeamParams {
-  name: string;
+export const joinTeam = async ({
+  userId,
+  teamId,
+  roomId,
+}: {
   userId: string;
+  teamId: string;
   roomId: string;
-  oldTeamId?: string;
-}
+}) => {
+  await repository.joinTeam({ id: userId }, { id: teamId });
+  await userRepository.joinTeam({ userId, teamId });
+  emitToRoom({ event: "participantUpdate", roomId });
+};
 
 export const leaveTeam = async ({
   userId,
@@ -21,11 +26,14 @@ export const leaveTeam = async ({
 }: {
   userId: string;
   teamId: string;
-  roomId?: string;
+  roomId: string;
 }) => {
   const team = await repository.leaveTeam({ userId, teamId });
+  await repository.leaveTeam({ userId, teamId });
+  emitToRoom({ event: "participantUpdate", roomId });
 
   if (team.members.length === 0) {
+    // TODO: consider adding delay to team deletion after play leaves it
     const deletedTeamRoomId =
       roomId ?? (await repository.getTeamById({ id: teamId })).roomId;
     await repository.deleteTeam({ id: teamId });
@@ -38,21 +46,16 @@ export const leaveTeam = async ({
   }
 };
 
-export const changeTeam = async (
-  userId: string,
-  teamId: string,
-  oldTeamId?: string
-) => {
-  if (oldTeamId) await leaveTeam({ userId, teamId: oldTeamId });
-
-  await joinTeam(userId, teamId);
-};
+interface CreateTeamParams {
+  name: string;
+  userId: string;
+  roomId: string;
+}
 
 export const createTeam = async ({
   name,
   userId,
   roomId,
-  oldTeamId,
 }: CreateTeamParams) => {
   const teamsWithThisNameInRoom = await repository.TeamsWithThisNameInRoom({
     roomId,
@@ -70,9 +73,9 @@ export const createTeam = async ({
         id: userId,
       },
     },
-  }); // TODO: switch team for user from here + delete from client + integrate with leaving a team
+  });
 
-  await changeTeam(userId, id, oldTeamId);
+  await joinTeam({ userId, teamId: id, roomId });
 
   emitToRoom({
     event: "participantUpdate",
