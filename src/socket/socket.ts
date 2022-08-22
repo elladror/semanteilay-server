@@ -8,6 +8,7 @@ import {
   handleSwitchTeam,
   handleJoinRoom,
   handleRoomsUpdate,
+  handleLeaveTeam,
 } from "./socketListeners";
 import { injectIO } from "./utils";
 
@@ -24,6 +25,7 @@ const init = (server: http.Server) => {
     socket.on("disconnecting", removeSocket(socket, io));
     socket.on("newGuess", handleNewGuess(socket, io));
     socket.on("switchTeam", handleSwitchTeam(socket, io));
+    socket.on("leaveTeam", handleLeaveTeam(socket, io));
     socket.on("joinRoom", handleJoinRoom(socket, io));
     socket.on("leaveRoom", handleLeaveRoom(socket, io));
     socket.on("create-room", handleRoomsUpdate(socket, io));

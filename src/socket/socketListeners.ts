@@ -39,6 +39,13 @@ export const handleSwitchTeam: SocketListener =
       socket.join(asSocketTeamId(newTeamId));
     };
 
+export const handleLeaveTeam: SocketListener =
+  // eslint-disable-next-line no-unused-vars, prettier/prettier
+    (socket, _io) =>
+    async (teamId) => {
+      socket.leave(asSocketTeamId(teamId));
+    };
+
 // eslint-disable-next-line no-unused-vars, prettier/prettier
 export const handleNewGuess: SocketListener = (socket, _io) => async (guess) => {
     socket.to(asSocketTeamId(guess.teamId)).emit("newGuess", guess);
