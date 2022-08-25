@@ -1,8 +1,16 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../db/prisma";
 
-export const addGuess = async (guess: Prisma.GuessUncheckedCreateInput) =>
-  prisma.guess.create({ data: guess });
+export const addGuess = async (guess: Prisma.GuessUncheckedCreateInput) => {
+  try {
+    return await prisma.guess.create({ data: guess });
+  } catch (error) {
+    throw error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+      ? new Error("guess already exists")
+      : error;
+  }
+};
 
 export const getGuessesByTeam = async ({
   teamId,

@@ -10,16 +10,7 @@ export const addGuess = async (guess: {
 }) => {
   const { similarity: score, distance: rank } = await guessWord(guess.word);
 
-  const topGuess = await repository.getTeamTopGuess(guess.teamId);
-
-  if (score > (topGuess?.score ?? -100))
-    emitToRoom({
-      event: "topGuessUpdate",
-      roomId: guess.roomId,
-      payload: { teamId: guess.teamId, topGuess: { score, rank } },
-    });
-
-  return repository.addGuess({
+  const addedGuess = await repository.addGuess({
     word: guess.word,
     ownerId: guess.ownerId,
     teamId: guess.teamId,
@@ -30,6 +21,17 @@ export const addGuess = async (guess: {
         teamId: guess.teamId,
       })) + 1,
   });
+
+  const topGuess = await repository.getTeamTopGuess(guess.teamId);
+
+  if (score > (topGuess?.score ?? -100))
+    emitToRoom({
+      event: "topGuessUpdate",
+      roomId: guess.roomId,
+      payload: { teamId: guess.teamId, topGuess: { score, rank } },
+    });
+
+  return addedGuess;
 };
 
 export const getTeamGuesses = async (teamId: string) =>

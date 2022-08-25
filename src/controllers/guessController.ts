@@ -8,7 +8,10 @@ guessRouter.post("/", async (req, res) => {
     const guess = await addGuess(req.body);
     res.send(guess);
   } catch (err) {
-    res.status(500).send((err as Error).message);
+    const status =
+      (err as Error).message === "guess already exists" ? 404 : 500;
+
+    res.status(status).send((err as Error).message);
   }
 });
 
