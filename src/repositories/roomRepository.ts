@@ -20,6 +20,7 @@ export const getRoomById = async ({ id }: Prisma.RoomWhereUniqueInput) =>
               guesses: true,
             },
           },
+          members: true,
         },
       },
     },
