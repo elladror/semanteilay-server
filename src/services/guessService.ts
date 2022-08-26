@@ -24,7 +24,7 @@ export const addGuess = async (guess: {
 
   const topGuess = await repository.getTeamTopGuess(guess.teamId);
 
-  if (score > (topGuess?.score ?? -100))
+  if (addedGuess.id === topGuess.id)
     emitToRoom({
       event: "topGuessUpdate",
       roomId: guess.roomId,
