@@ -47,7 +47,7 @@ export const leaveRoom = async ({
 }) => {
   await repository.leaveRoom({ id: userId });
 
-  const DELETE_ROOM_IF_EMPTY_DELAY = 1000 * 10 * 1;
+  const DELETE_ROOM_IF_EMPTY_DELAY = 1000 * 60 * 5;
 
   setTimeout(async () => {
     try {
