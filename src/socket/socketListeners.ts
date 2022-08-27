@@ -12,7 +12,11 @@ type SocketListener = (
 ) => (...args: any) => void;
 
 export const removeSocket: SocketListener = (socket) => async () => {
-  if (socket.data.userId) await setIdle(socket.data.userId);
+  try {
+    if (socket.data.userId) await setIdle(socket.data.userId);
+  } catch (_error) {
+    //
+  }
 
   const socketRoomId = Array.from(socket.rooms).find(isRoom) as string;
 
@@ -43,8 +47,8 @@ export const handleLeaveTeam: SocketListener =
   // eslint-disable-next-line no-unused-vars, prettier/prettier
     (socket, _io) =>
     async (teamId) => {
-      socket.leave(asSocketTeamId(teamId));
-    };
+    socket.leave(asSocketTeamId(teamId));
+  };
 
 // eslint-disable-next-line no-unused-vars, prettier/prettier
 export const handleNewGuess: SocketListener = (socket, _io) => async (guess) => {
