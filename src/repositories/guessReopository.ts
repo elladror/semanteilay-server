@@ -3,7 +3,10 @@ import prisma from "../db/prisma";
 
 export const addGuess = async (guess: Prisma.GuessUncheckedCreateInput) => {
   try {
-    return await prisma.guess.create({ data: guess });
+    return await prisma.guess.create({
+      data: guess,
+      include: { owner: { select: { name: true } } },
+    });
   } catch (error) {
     throw error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
@@ -25,6 +28,7 @@ export const getGuessesByTeam = async ({
           score: "desc",
         }
       : {},
+    include: { owner: { select: { name: true } } },
   });
 
 export const getGuessesCountByTeam = async ({
