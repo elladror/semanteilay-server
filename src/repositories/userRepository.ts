@@ -30,6 +30,8 @@ const updateCallWrapper = async (wrapped: Promise<User>) => {
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2025") throw new Error("user not found");
+      if (error.code === "P2003" && error.message.includes("roomId"))
+        throw new Error("no such room");
     }
 
     throw error;
@@ -61,7 +63,7 @@ export const leaveRoom = async ({ id }: Prisma.UserWhereUniqueInput) =>
     prisma.user.update({
       where: { id },
       data: {
-        roomId: "",
+        roomId: null,
       },
     })
   );

@@ -66,7 +66,9 @@ userRouter.patch("/joinRoom", async (req, res) => {
     const user = await joinRoom(req.body);
     res.send(user);
   } catch (err) {
-    const status = (err as Error).message === "user not found" ? 404 : 500;
+    const { message } = err as Error;
+    const status =
+      message === "user not found" || message === "no such room" ? 404 : 500;
 
     res.status(status).send((err as Error).message);
   }

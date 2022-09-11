@@ -15,6 +15,7 @@ model User {
   name    String  @unique
   team    Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
   teamId  String?
+  room    Room?   @relation(fields: [roomId], references: [id], onDelete: SetNull)
   roomId  String?
   guesses Guess[]
   status  Status  @default(ACTIVE)
@@ -37,9 +38,10 @@ model Team {
 }
 
 model Room {
-  id    String @id @default(uuid())
-  name  String @unique
-  teams Team[]
+  id      String @id @default(uuid())
+  name    String @unique
+  teams   Team[]
+  members User[]
 }
 
 model Guess {
