@@ -51,9 +51,13 @@ export const handleLeaveTeam: SocketListener =
   };
 
 // eslint-disable-next-line no-unused-vars, prettier/prettier
-export const handleNewGuess: SocketListener = (socket, _io) => async (guess) => {
-    socket.to(asSocketTeamId(guess.teamId)).emit("newGuess", guess);
-  };
+export const handleNewGuess: SocketListener = (socket, io) => async (guess) => {
+  socket.to(asSocketTeamId(guess.teamId)).emit("newGuess", guess);
+  io.to(asSocketRoomId(guess.roomId)).emit("guessCountUpdate", {
+    teamId: guess.teamId,
+    count: guess.serialNumber,
+  });
+};
 
 export const handleRoomsUpdate: SocketListener = (_socket, io) => async () => {
   io.to("lobby").emit("roomsUpdated"); // TODO: consider moving from SWR to emitting map of rooms and participants
