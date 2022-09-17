@@ -8,10 +8,23 @@ guessRouter.post("/", async (req, res) => {
     const guess = await addGuess(req.body);
     res.send(guess);
   } catch (err) {
-    const status =
-      (err as Error).message === "guess already exists" ? 404 : 500;
+    const { message } = err as Error;
 
-    res.status(status).send((err as Error).message);
+    let status: number;
+
+    switch (message) {
+      case "guess already exists":
+        status = 409;
+        break;
+      case "unknown word":
+        status = 406;
+        break;
+      default:
+        status = 500;
+        break;
+    }
+
+    res.status(status).send(message);
   }
 });
 

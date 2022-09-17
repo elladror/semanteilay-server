@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://semantle-he.herokuapp.com/api/distance?word=";
+const BASE_URL = "https://semantle.ishefi.com/api/distance?word=";
 
 const guessWord = async (word: string) => {
   const url = encodeURI(decodeURI(`${BASE_URL + word}`));
