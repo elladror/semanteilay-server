@@ -5,6 +5,9 @@ kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
 
+[build.args]
+  DATABASE_URL = "https://semanteilay-server-db.fly.dev"
+
 [env]
   PORT = "8080"
 
