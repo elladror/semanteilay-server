@@ -18,6 +18,7 @@ WORKDIR /app
 # Ref: https://docs.npmjs.com/cli/v9/commands/npm-install#description
 
 ENV NODE_ENV production
+ENV DATABASE_URL $DATABASE_URL
 
 COPY . .
 
