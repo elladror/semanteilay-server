@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist",
-    "postinstall": "tsc && npx prisma migrate deploy",
+    "postinstall": "npx prisma migrate deploy",
     "watch-node": "nodemon dist/index.js",
     "watch-ts": "tsc -w",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
@@ -20,13 +20,14 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
-    "socket.io": "^4.4.1"
-  },
-  "devDependencies": {
+    "socket.io": "^4.4.1",
+    "typescript": "4.6.3",
     "@types/connect-redis": "^0.0.18",
     "@types/express": "^4.17.13",
     "@types/express-session": "^1.17.4",
-    "@types/node": "17.0.25",
+    "@types/node": "17.0.25"
+  },
+  "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.32.0",
     "concurrently": "^7.1.0",
@@ -36,7 +37,6 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "nodemon": "^2.0.16",
-    "prisma": "^4.2.1",
-    "typescript": "4.6.3"
+    "prisma": "^4.2.1"
   }
 }
