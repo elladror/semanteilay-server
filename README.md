@@ -9,5 +9,5 @@ docker run --name semanteilay-db -e POSTGRES_PASSWORD=pgsql10 -d -p 5432:5432 po
 PORT=9000
 DATABASE_URL=postgresql://postgres:pgsql10@localhost:5432
 
-in .env 
+in .env file
 
