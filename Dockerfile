@@ -1,6 +1,7 @@
 FROM debian:bullseye as builder
 
 ARG NODE_VERSION=16.14.0
+ARG DATABASE_URL
 
 RUN apt-get update; apt install -y curl
 RUN curl https://get.volta.sh | bash
@@ -18,7 +19,7 @@ WORKDIR /app
 # Ref: https://docs.npmjs.com/cli/v9/commands/npm-install#description
 
 ENV NODE_ENV production
-ENV DATABASE_URL $DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
 
 COPY . .
 
