@@ -6,7 +6,7 @@ kill_timeout = 5
 processes = []
 
 [build.args]
-  DATABASE_URL = "https://semanteilay-server-db.fly.dev"
+  DATABASE_URL = "postgres://postgres:tMKi0gK5F1EcKxf@semanteilay-server-db.internal:5432"
 
 [env]
   PORT = "8080"
