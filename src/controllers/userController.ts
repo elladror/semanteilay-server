@@ -15,7 +15,10 @@ userRouter.post("/", async (req, res) => {
     const id = await signUp(req.body.name, req.body.socketId);
     res.send({ id });
   } catch (err) {
-    res.status(409).send((err as Error).message);
+    const errorMessage = (err as Error).message;
+    res
+      .status(errorMessage === "nickname taken" ? 409 : 503)
+      .send(errorMessage);
   }
 });
 
