@@ -1,8 +1,8 @@
 name: Purge
 on:
-  schedule:
-    # Runs "at minute 51 past every hour" (see https://crontab.guru)
-    - cron: '51 * * * *'
+  push:
+    branches:
+      - main
 env:
   DATABASE_URL: ${{ secrets.FLYIO_DATABASE_URL }}
 jobs:
