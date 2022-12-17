@@ -1,1 +1,1 @@
-DELETE FROM room;
+DELETE FROM rooms;
