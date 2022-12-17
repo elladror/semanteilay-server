@@ -15,5 +15,5 @@ jobs:
           with:
             node-version: 16
         - run: npm i prisma
-        - run: npx prisma db excute --file scripts/delete-rooms.sql --url="$DATABASE_URL"
-        - run: npx prisma db excute --file scripts/invalidate.sql --url="$DATABASE_URL"
+        - run: npx prisma db execute --file scripts/delete-rooms.sql --url="$DATABASE_URL"
+        - run: npx prisma db execute --file scripts/invalidate.sql --url="$DATABASE_URL"
