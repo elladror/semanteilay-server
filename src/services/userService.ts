@@ -1,4 +1,4 @@
-import { emitToSocket, hookSocketWithUser } from "../socket/utils";
+import { emitToRoom, emitToSocket, hookSocketWithUser } from "../socket/utils";
 import * as repository from "../repositories/userRepository";
 import { deleteRoom } from "./roomService";
 
@@ -26,7 +26,14 @@ export const login = async ({
   return user;
 };
 
-export const setIdle = (userId: string) => repository.setIdle({ id: userId });
+export const setIdle = async (userId: string) => {
+  const updatedUser = await repository.setIdle({ id: userId });
+
+  if (updatedUser.roomId)
+    emitToRoom({ event: "participantUpdate", roomId: updatedUser.roomId });
+
+  return updatedUser;
+};
 
 export const getUserById = async (id: string) => repository.getUserById({ id });
 
