@@ -2,7 +2,7 @@ name: Purge
 on:
   push:
     branches:
-      - main
+      - dev
 env:
   DATABASE_URL: ${{ secrets.FLYIO_DATABASE_URL }}
 jobs:
