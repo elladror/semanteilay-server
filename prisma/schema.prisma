@@ -19,11 +19,14 @@ model User {
   roomId  String?
   guesses Guess[]
   status  Status  @default(ACTIVE)
+
+  @@map("users")
 }
 
 enum Status {
   ACTIVE
   IDLE
+  OLD
 }
 
 model Team {
@@ -35,6 +38,7 @@ model Team {
   guesses Guess[]
 
   @@unique([name, roomId])
+  @@map("team")
 }
 
 model Room {
@@ -42,6 +46,8 @@ model Room {
   name    String @unique
   teams   Team[]
   members User[]
+
+  @@map("room")
 }
 
 model Guess {
@@ -49,11 +55,12 @@ model Guess {
   word         String
   score        Float
   rank         Int
-  owner        User   @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  owner        User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   ownerId      String
   team         Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
   teamId       String
   serialNumber Int
 
   @@unique([word, teamId])
+  @@map("guess")
 }

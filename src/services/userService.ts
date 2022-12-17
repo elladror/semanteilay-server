@@ -3,11 +3,13 @@ import * as repository from "../repositories/userRepository";
 import { deleteRoom } from "./roomService";
 
 export const signUp = async (name: string, socketId: string) => {
-  if (await repository.isNameTaken({ name })) {
+  const existingUser = await repository.getUserByName({ name });
+
+  if (existingUser && existingUser.status !== "OLD") {
     throw new Error("nickname taken");
   }
 
-  const { id } = await repository.createUser({ name });
+  const { id } = await repository.upsertUser({ name });
   await hookSocketWithUser(id, socketId);
 
   return id;
@@ -20,6 +22,11 @@ export const login = async ({
   userId: string;
   socketId: string;
 }) => {
+  const existingUser = await repository.getUserById({ id: userId });
+  console.log(existingUser);
+
+  if (existingUser.status === "OLD") return null;
+
   const user = await repository.login({ id: userId });
   await hookSocketWithUser(userId, socketId);
 
@@ -27,6 +34,10 @@ export const login = async ({
 };
 
 export const setIdle = async (userId: string) => {
+  const existingUser = await repository.getUserById({ id: userId });
+
+  if (existingUser.status === "OLD") return null;
+
   const updatedUser = await repository.setIdle({ id: userId });
 
   if (updatedUser.roomId)
