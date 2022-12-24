@@ -1,4 +1,4 @@
-# fly.toml file generated for semanteilay-server on 2022-12-17T23:38:01+02:00
+# fly.toml file generated for semanteilay-server on 2022-12-24T21:48:16+02:00
 
 app = "semanteilay-server"
 kill_signal = "SIGINT"
@@ -6,7 +6,7 @@ kill_timeout = 5
 processes = []
 
 [build.args]
-  DATABASE_URL = "postgres://postgres:x7toI50gGKzRXC9@semanteilay-server-db.internal:5432"
+  DATABASE_URL = "postgres://postgres:4punssWdbM3Nsiu@semanteilay-server-db.internal:5432"
 
 [env]
   PORT = "8080"
