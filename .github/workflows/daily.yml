@@ -15,7 +15,7 @@ jobs:
         - run: |
             flyctl proxy 5432 -a semanteilay-server-db >/dev/null 2>&1 &
             sleep 5
-            psql -U postgres -h localhost -p 5432 semanteilay-server-db -f scripts/delete-rooms.sql
-            psql -U postgres -h localhost -p 5432 semanteilay-server-db -f scripts/invalidate.sql
+            psql postgres://postgres:4punssWdbM3Nsiu@localhost:5432 -f scripts/delete-rooms.sql
+            psql postgres://postgres:4punssWdbM3Nsiu@localhost:5432 -f scripts/invalidate.sql
       env:
         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
