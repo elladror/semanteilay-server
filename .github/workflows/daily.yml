@@ -1,7 +1,7 @@
 name: Purge
 on:
   schedule:
-    - cron: '*/1 * * * *'
+    - cron: '0 02 * * *'
 jobs:
   purge:
       name: purge
