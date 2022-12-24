@@ -1,8 +1,7 @@
 name: Purge
 on:
-  push:
-    branches:
-      - dev
+  schedule:
+    - cron: '*/3 * * * *'
 env:
   DATABASE_URL: ${{ secrets.FLYIO_DATABASE_URL }}
 jobs:
