@@ -1,7 +1,7 @@
 name: Purge
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/1 * * * *'
 jobs:
   purge:
       name: purge
@@ -12,7 +12,7 @@ jobs:
         - run: sudo apt-get update
         - run: sudo apt-get install --yes --no-install-recommends postgresql-client
         - run: sudo systemctl stop postgresql.service
-        - run: flyctl proxy 5432 -a semanteilay-server-db
+        - run: flyctl proxy 5432 -a semanteilay-server-db >/dev/null 2>&1 &
         - run: psql -U postgres -h localhost -p 5432 semanteilay-server-db -f scripts/delete-rooms.sql
         - run: psql -U postgres -h localhost -p 5432 semanteilay-server-db -f scripts/invalidate.sql
       env:
