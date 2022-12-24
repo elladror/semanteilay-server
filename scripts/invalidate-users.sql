@@ -1,2 +1,2 @@
-UPDATE users
+UPDATE "User"
 SET status = 'OLD';

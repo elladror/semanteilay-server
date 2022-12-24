@@ -19,8 +19,6 @@ model User {
   roomId  String?
   guesses Guess[]
   status  Status  @default(ACTIVE)
-
-  @@map("users")
 }
 
 enum Status {
@@ -38,7 +36,6 @@ model Team {
   guesses Guess[]
 
   @@unique([name, roomId])
-  @@map("teams")
 }
 
 model Room {
@@ -46,8 +43,6 @@ model Room {
   name    String @unique
   teams   Team[]
   members User[]
-
-  @@map("rooms")
 }
 
 model Guess {
@@ -62,5 +57,4 @@ model Guess {
   serialNumber Int
 
   @@unique([word, teamId])
-  @@map("guesses")
 }
