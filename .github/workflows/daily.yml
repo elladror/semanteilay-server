@@ -2,17 +2,19 @@ name: Purge
 on:
   schedule:
     - cron: '*/3 * * * *'
-env:
-  DATABASE_URL: ${{ secrets.FLYIO_DATABASE_URL }}
 jobs:
   purge:
       name: purge
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v3
-        - uses: actions/setup-node@v3
-          with:
-            node-version: 16
-        - run: npm i prisma
-        - run: npx prisma db execute --file scripts/delete-rooms.sql --url="$DATABASE_URL"
-        - run: npx prisma db execute --file scripts/invalidate.sql --url="$DATABASE_URL"
+        - uses: superfly/flyctl-actions/setup-flyctl@master
+        - run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends postgresql-client
+        - run: systemctl stop postgresql.service
+        - run: flyctl proxy 5432 -a semanteilay-server-db
+        - run: psql -U postgres -h localhost -p 5432 semanteilay-server-db -f scripts/delete-rooms.sql
+        - run: psql -U postgres -h localhost -p 5432 semanteilay-server-db -f scripts/invalidate.sql
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
