@@ -10,6 +10,7 @@ processes = []
 
 [env]
   PORT = "8080"
+  DATABASE_URL = "postgres://postgres:4punssWdbM3Nsiu@semanteilay-server-db.internal:5432"
 
 [experimental]
   allowed_public_ports = []
