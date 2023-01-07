@@ -52,11 +52,6 @@ export const getTeamsTopGuesses = async (teams: string[]) =>
       score: true,
       rank: true,
     },
-    orderBy: {
-      _max: {
-        score: "desc",
-      },
-    },
   });
 
 export const getTeamTopGuess = async (teamId: string) =>
