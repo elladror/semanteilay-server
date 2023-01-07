@@ -23,7 +23,6 @@ export const login = async ({
   socketId: string;
 }) => {
   const existingUser = await repository.getUserById({ id: userId });
-  console.log(existingUser);
 
   if (existingUser.status === "OLD") return null;
 
