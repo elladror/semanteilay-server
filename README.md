@@ -1,6 +1,6 @@
 # semanteilay-server
 
-noder neder.
+noder neder
 
 # to run locally hook postgresql with docker image
 
