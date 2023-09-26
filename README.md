@@ -10,4 +10,3 @@ PORT=9000
 DATABASE_URL=postgresql://postgres:pgsql10@localhost:5432
 
 in .env file
-
