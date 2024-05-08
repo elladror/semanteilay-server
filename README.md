@@ -1,6 +1,6 @@
 # semanteilay-server
 
-noder nedarim
+mahat
 
 # to run locally hook postgresql with docker image
 
